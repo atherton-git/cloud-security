@@ -26,10 +26,12 @@ for i in filename:
     policy_objects=policy_objects.append(data,ignore_index=True)
 
 # Normalising the "properties" column, concatenating the output with "id" and "name"
-policy_objects = pd.concat([policy_objects[["id","name"]],pd.json_normalize(policy_objects['properties'],max_level=1)],axis=1)
+policy_objects = pd.concat([policy_objects[["id","name"]],pd.json_normalize(policy_objects['properties'],max_level=2)],axis=1)
 
 # Removing "depracated" policies
 policy_objects = policy_objects[~policy_objects['metadata.version'].str.endswith('-deprecated')]
 
 # Writing dataframe to csv
-policy_objects.to_csv(f'output_{service}.csv', columns=["metadata.category","name","id","displayName","description","metadata.version"], index=False)
+policy_objects.to_csv(f'output_{service}.csv', 
+columns=["metadata.category","policyType","mode","name","id","displayName","description","parameters.effect.allowedValues","metadata.version"],
+index=False)
