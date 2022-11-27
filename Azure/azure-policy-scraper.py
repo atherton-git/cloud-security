@@ -31,7 +31,10 @@ policy_objects = pd.concat([policy_objects[["id","name"]],pd.json_normalize(poli
 # Removing "depracated" policies
 policy_objects = policy_objects[~policy_objects['metadata.version'].str.endswith('-deprecated')]
 
+# Removing prefixes from columns
+policy_objects.columns = [re.sub('^parameters.|^metadata.',"", i) for i in policy_objects.columns]
+
 # Writing dataframe to csv
 policy_objects.to_csv(f'output_{service}.csv', 
-columns=["metadata.category","policyType","mode","name","id","displayName","description","parameters.effect.allowedValues","metadata.version"],
+columns=["category","policyType","mode","name","id","displayName","description","effect.allowedValues","effect.defaultValue","version"],
 index=False)
