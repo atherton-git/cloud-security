@@ -14,15 +14,15 @@ response = requests.get(github_url)
 gitlab_table = BeautifulSoup(response.text, 'html.parser')
 jsonfiles = gitlab_table.find_all(title=re.compile("\.json$"))
 
-filename = [ ]
-for i in jsonfiles:
-        filename.append(i.extract().get_text())
+policy_list = [ ]
+for filename in jsonfiles:
+        policy_list.append(filename.extract().get_text())
 
 # Loop through the policies and parse the raw data
 policy_objects = pd.DataFrame()
-for i in filename:
+for policy in policy_list:
     ssl._create_default_https_context = ssl._create_unverified_context
-    data = pd.read_json(f'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/{service}/{i}', typ='series')
+    data = pd.read_json(f'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/{service}/{policy}', typ='series')
     policy_objects=policy_objects.append(data,ignore_index=True)
 
 # Normalising the "properties" column, concatenating the output with "id" and "name"
@@ -36,5 +36,5 @@ policy_objects.columns = [re.sub('^parameters.|^metadata.',"", i) for i in polic
 
 # Writing dataframe to csv
 policy_objects.to_csv(f'output_{service}.csv', 
-columns=["category","policyType","mode","name","id","displayName","description","effect.allowedValues","effect.defaultValue","version"],
+columns=["category","policyType","name","id","displayName","description","mode","effect.allowedValues","effect.defaultValue","version"],
 index=False)
