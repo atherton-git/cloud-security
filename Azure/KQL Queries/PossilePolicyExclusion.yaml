@@ -4,8 +4,9 @@ AzureActivity
     and (parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).notScopes != "")
 | extend Time = substring(TimeGenerated, 0, 16)
 | extend Operation = substring(OperationNameValue, -5)
-| extend PolicyExclusionJson = tostring(parse_json…fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', @'')
-| project 
+| extend PolicyExclusionJson = tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).notScopes)))
+| extend PolicyExclusionList = replace_regex(PolicyExclusionJson,@'/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', @'')
+| project
     Time,
     Operation,
     parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).displayName,
