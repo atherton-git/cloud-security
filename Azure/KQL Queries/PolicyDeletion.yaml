@@ -1,14 +1,11 @@
 AzureActivity
 | where (OperationNameValue == "MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/DELETE") and (ActivityStatusValue == "Success")
-| extend Time = substring(TimeGenerated, 0, 16)
-| extend Operation = substring(OperationNameValue, -6)
+    | extend Time = substring(TimeGenerated, 0, 16)
+    | extend Operation = substring(OperationNameValue, -6)
 | project
     Time,
     Operation,
-    parse_json(tostring(parse_json(tostring(Properties_d.responseBody)).properties)).displayName,
-    parse_json(tostring(parse_json(tostring(Properties_d.responseBody)).properties)).scope,
+    PolicyName = parse_json(tostring(parse_json(tostring(Properties_d.responseBody)).properties)).displayName,
+    Subscription = parse_json(tostring(parse_json(tostring(Properties_d.responseBody)).properties)).scope,
     Caller
-| project-rename
-    PolicyName = Properties_d_responseBody_properties_displayName,
-    Subscription = Properties_d_responseBody_properties_scope
 | sort by Time desc
