@@ -1,19 +1,20 @@
 AzureActivity
 | where (OperationNameValue == "MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE") and (ActivityStatusValue == "Start")
-    and (parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).notScopes != "[]")
-    and (parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).notScopes != "")
+    and ((parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).resourceSelectors != "[]")
+        and (parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).resourceSelectors != ""))
+    or ((parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).notScopes != "[]")
+        and (parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).notScopes != ""))
 | extend Time = substring(TimeGenerated, 0, 16)
 | extend Operation = substring(OperationNameValue, -5)
 | extend PolicyExclusionJson = tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).notScopes)))
 | extend PolicyExclusionList = replace_regex(PolicyExclusionJson,@'/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', @'')
+| extend ResourceSelector = tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).resourceSelectors)))
 | project
     Time,
     Operation,
-    parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).displayName,
+    PolicyName = parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).displayName,
     PolicyExclusionList,
-    parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).scope,
+    ResourceSelector,
+    Subscription = parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).scope,
     Caller
-| project-rename
-    PolicyName = Properties_d_requestbody_properties_displayName,
-    Subscription = Properties_d_requestbody_properties_scope
 | sort by Time desc
