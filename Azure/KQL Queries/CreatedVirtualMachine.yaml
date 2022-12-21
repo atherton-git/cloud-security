@@ -1,0 +1,15 @@
+AzureActivity
+| where OperationNameValue == "MICROSOFT.COMPUTE/VIRTUALMACHINES/WRITE" and ActivitySubstatusValue == "Created"
+    | extend Time = substring(TimeGenerated, 0, 16)
+    | extend Location = tostring(parse_json(tostring(Properties_d.responseBody)).location)
+    | extend ResourceType = replace_regex(tostring(parse_json(tostring(Properties_d.responseBody)).type),@'(.*)\/', @'')
+    | extend Resource = replace_regex(_ResourceId,@'/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', @'')
+| project
+    Time,
+    Operation = ActivitySubstatusValue,
+    ResourceType,
+    Resource,
+    Location,
+    Subscription = SubscriptionId,
+    Caller
+| sort by Time desc

@@ -1,0 +1,15 @@
+AzureActivity
+| sort by TimeGenerated desc
+| where OperationNameValue == "Microsoft.Sql/servers/databases/write" and ActivityStatusValue == "Succeeded"
+    | extend Time = substring(TimeGenerated, 0, 16)
+    | extend DatabaseName = replace_regex(tostring(Properties_d.resource),@'(.*)\/', @'')
+    | extend Resource = replace_regex(_ResourceId,@'/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', @'')
+| project
+    Time,
+    Operation = tostring(Properties_d.EventName),
+    ServerName = tostring(parse_json(tostring(Properties_d.EventProperties)).ServerName),
+    DatabaseName,
+    Resource,
+    Subscription = SubscriptionId,
+    Caller = tostring(Properties_d.Caller)
+| sort by Time desc
