@@ -1,4 +1,5 @@
 AzureActivity
+| sort by TimeGenerated desc
 | where (OperationNameValue == "MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE") and (ActivityStatusValue == "Start")
     | extend ResourceSelector = tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).resourceSelectors)))
     | extend PolicyExclusionJson = tostring(parse_json(tostring(parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).notScopes)))
@@ -14,4 +15,3 @@ AzureActivity
     ResourceSelector,
     Subscription = parse_json(tostring(parse_json(tostring(Properties_d.requestbody)).properties)).scope,
     Caller
-| sort by Time desc

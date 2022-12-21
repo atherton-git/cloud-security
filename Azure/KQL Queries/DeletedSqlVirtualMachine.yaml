@@ -1,15 +1,15 @@
 AzureActivity
 | sort by TimeGenerated desc
-| where OperationNameValue == "MICROSOFT.NETWORK/PUBLICIPADDRESSES/WRITE" and ActivitySubstatusValue == "Created"
-    | extend ResourceType = replace_regex(tostring(parse_json(tostring(Properties_d.responseBody)).type),@'(.*)\/', @'')
+| where OperationNameValue == "MICROSOFT.SQLVIRTUALMACHINE/SQLVIRTUALMACHINES/DELETE" and ActivityStatusValue == "Start"
     | extend Time = substring(TimeGenerated, 0, 16)
+    | extend Operation = substring(OperationNameValue, -6)
+    | extend ResourceType = replace_regex(tostring(Properties_d.resourceProviderValue),@'(.*)\.', @'')
     | extend Location = tostring(parse_json(tostring(Properties_d.responseBody)).location)
     | extend Resource = replace_regex(_ResourceId,@'/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', @'')
 | project
     Time,
-    Operation = ActivitySubstatusValue,
+    Operation,
     ResourceType,
     Resource,
     Location,
-    Subscription = SubscriptionId,
-    Caller
+    Subscription = SubscriptionId

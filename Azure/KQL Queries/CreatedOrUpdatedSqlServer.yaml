@@ -1,0 +1,13 @@
+AzureActivity
+| sort by TimeGenerated desc
+| where OperationNameValue == "MICROSOFT.SQL/SERVERS/WRITE" and ActivitySubstatusValue == "Accepted"
+    | extend Time = substring(TimeGenerated, 0, 16)
+    | extend ServerName = replace_regex(tostring(Properties_d.resource), @'(.*)\/', @'')
+    | extend Resource = replace_regex(_ResourceId, @'/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', @'')
+| project
+    Time,
+    Operation = "Created or Updated",
+    ServerName,
+    Resource,
+    Subscription = SubscriptionId,
+    Caller

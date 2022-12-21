@@ -12,4 +12,3 @@ AzureActivity
     Resource,
     Subscription = SubscriptionId,
     Caller = tostring(Properties_d.Caller)
-| sort by Time desc

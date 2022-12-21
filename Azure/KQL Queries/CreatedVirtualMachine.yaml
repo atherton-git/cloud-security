@@ -1,4 +1,5 @@
 AzureActivity
+| sort by TimeGenerated desc
 | where OperationNameValue == "MICROSOFT.COMPUTE/VIRTUALMACHINES/WRITE" and ActivitySubstatusValue == "Created"
     | extend Time = substring(TimeGenerated, 0, 16)
     | extend Location = tostring(parse_json(tostring(Properties_d.responseBody)).location)
@@ -12,4 +13,3 @@ AzureActivity
     Location,
     Subscription = SubscriptionId,
     Caller
-| sort by Time desc

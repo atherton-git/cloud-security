@@ -1,4 +1,5 @@
 AzureActivity
+| sort by TimeGenerated desc
 | where OperationNameValue == "MICROSOFT.SQLVIRTUALMACHINE/SQLVIRTUALMACHINES/WRITE" and ActivitySubstatusValue == "Created"
     | extend Time = substring(TimeGenerated, 0, 16)
     | extend ResourceType = replace_regex(tostring(Properties_d.resourceProviderValue),@'(.*)\.', @'')
@@ -12,4 +13,3 @@ AzureActivity
     Location,
     Subscription = SubscriptionId,
     Caller
-| sort by Time desc
