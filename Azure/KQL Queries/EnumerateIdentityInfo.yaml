@@ -1,0 +1,12 @@
+IdentityInfo
+| where TimeGenerated >= ago(30d)
+| summarize count() by
+    AccountName, 
+    AccountDisplayName, 
+    AccountUPN, 
+    JobTitle, 
+    tostring(GroupMembership), 
+    tostring(AssignedRoles), 
+    AccountCreationTime, 
+    IsAccountEnabled
+| where AccountUPN contains "sampleUsername"
