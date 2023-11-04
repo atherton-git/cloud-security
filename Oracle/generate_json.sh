@@ -8,7 +8,7 @@ while read -r line; do
   echo "  \"source\": \"${line}\","
   echo "  \"protocol\": \"17\","
   echo "  \"isStateless\": \"false\","
-  echo "  \"tcp-options\": {"
+  echo "  \"udp-options\": {"
   echo "    \"destination_port_range\": {"
   echo "      \"max\": 51820,"
   echo "      \"min\": 51820"
